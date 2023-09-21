@@ -7,13 +7,14 @@ from rest_framework.routers import DefaultRouter
 
 #router for class views
 router = DefaultRouter()
-router.register('rednerin', views.RednerinViewSet, basename='rednerin')
-router.register('rednerinInfo', views.RednerinInfoViewSet, basename='rednerinInfo')
+router.register('speacher', views.SpeacherViewSet, basename='speacher')
+router.register('speacherInfo', views.SpeacherInfoViewSet, basename='speacherInfo')
 router.register('subject', views.SubjectViewSet, basename='subject')
 router.register('url', views.UrlViewSet, basename='url')
 router.register('socialnetwork', views.SocialNetworkViewSet, basename='socialnetwork')
+router.register('photo', views.PhotoViewSet, basename='photo')
 router.register('video', views.VideoViewSet, basename='video')
-
+router.register('contact', views.ContactViewSet, basename='contact')
 
 urlpatterns = [
 

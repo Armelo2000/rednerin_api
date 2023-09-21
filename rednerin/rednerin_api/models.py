@@ -3,44 +3,18 @@ from django.db import models
 # Create your models here.
 #from django.contrib.postgres.fields import ArrayField
 
-class Rednerin(models.Model):
-
-    class Partition(models.IntegerChoices):
-        BASIS = 1
-        PREMIUM = 2
-        COMPANY = 3
-    
-    """ Alternative
-
-        partition = {
-        'Basis': 1,
-        'Premium': 2,
-        'Company': 3
-    }
-    
-    """
-    #rednerin_Id = models.BigAutoField(primary_key=True, db_column='rednerin_Id')
-    #info = models.OneToOneField("RednerinInfo", on_delete=models.CASCADE)
-    firstname = models.CharField(max_length=100)
-    lastname = models.CharField(max_length=100)
+class Contact(models.Model):
     street = models.CharField(max_length=100, blank=True)
     houseNr = models.CharField(max_length=10, blank=True)
     zipCode = models.CharField(max_length=10, blank=True)
     city = models.CharField(max_length=100, blank=True)
     country = models.CharField(max_length=100, blank=True)
     phone = models.CharField(max_length=25, blank=True)
-    phonePublish = models.BooleanField(default=False)
-    option = models.IntegerField(choices=Partition.choices, default=Partition.BASIS)
-
-    image = models.ImageField(upload_to='images/', default=None, null=True, blank=True)
-    #Datenschutz
-    policy = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.firstname + ' ' + self.lastname
+        return f'{self.street} {self.houseNr}'
 
-
-class RednerinInfo(models.Model):
+class SpeacherInfo(models.Model):
 
     #language = ArrayField(models.CharField(max_length=200), blank=True)
     language = models.CharField(max_length=500, blank=True)
@@ -52,12 +26,42 @@ class RednerinInfo(models.Model):
     exampleLecture = models.TextField(max_length=500, blank=True)
     shortBiography = models.TextField(max_length=500, blank=True)
     longBiography = models.TextField(max_length=5000, blank=True)
-    subject = models.ManyToManyField('Subject', blank=True, related_name='subject')
-    rednerin_Id = models.OneToOneField(Rednerin, related_name='information', on_delete=models.CASCADE)
-    
+    #subject = models.ManyToManyField('Subject', blank=True, related_name='subject')
+    #rednerin_Id = models.OneToOneField(Rednerin, related_name='information', on_delete=models.CASCADE)
 
     def __str__(self):
-        return str(self.rednerin_Id)
+        return self.profession
+
+#Rednerin Tabelle
+class Speacher(models.Model):
+    BASIS = "BA"
+    PREMIUM = "PR"
+    COMPANY = "CO"
+ 
+    ACCOUNT_TYP_CHOICES = [
+        (BASIS, "Basis"),
+        (PREMIUM, "Premium"),
+        (COMPANY, "Company"),
+    ]
+    
+    #rednerin_Id = models.BigAutoField(primary_key=True, db_column='rednerin_Id')
+    #info = models.OneToOneField("RednerinInfo", on_delete=models.CASCADE)
+    firstname = models.CharField(max_length=100)
+    lastname = models.CharField(max_length=100)
+    phonePublish = models.BooleanField(default=False)
+    accountType = models.CharField(
+        max_length=2, 
+        choices=ACCOUNT_TYP_CHOICES, 
+        default=BASIS)
+
+    #Datenschutz
+    policy = models.BooleanField(default=False)
+    info = models.OneToOneField(SpeacherInfo, on_delete=models.CASCADE)
+    contact = models.OneToOneField("Contact", on_delete=models.CASCADE)
+    subject = models.ManyToManyField('Subject', blank=True, related_name='subject')
+
+    def __str__(self):
+        return self.firstname + ' ' + self.lastname
 
 
 class Subject(models.Model):
@@ -69,8 +73,8 @@ class Subject(models.Model):
 
 
 class Url(models.Model):
-    urlLink = models.CharField(max_length=100)
-    rednerinInfo = models.ForeignKey(RednerinInfo, related_name='url', on_delete=models.CASCADE)
+    urlLink = models.URLField('url')
+    speacher = models.ForeignKey(Speacher, related_name='url', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.urlLink
@@ -78,16 +82,25 @@ class Url(models.Model):
 class SocialNetwork(models.Model):
     socialNetworkName = models.CharField(max_length=100)
     icon = models.ImageField(upload_to='icons/', default=None, null=True, blank=True)
-    rednerinInfo = models.ForeignKey(RednerinInfo, related_name='socialnetwork', on_delete=models.CASCADE)
+    speacher = models.ForeignKey(Speacher, related_name='socialnetwork', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.socialNetworkName
 
+class Photo(models.Model):
+        caption = models.CharField(max_length=50)
+        photo = models.ImageField(upload_to='photos_uploaded/', null=True) #allowed_extensions=['MOV','avi','mp4','webm','mkv'])
+        speacher = models.ForeignKey(Speacher, related_name='photo', on_delete=models.CASCADE)
+
+        def __str__(self):
+            return self.caption
 
 class Video(models.Model):
         caption = models.CharField(max_length=50)
         video = models.FileField(upload_to='videos_uploaded/', null=True) #allowed_extensions=['MOV','avi','mp4','webm','mkv'])
-        rednerinInfo = models.ForeignKey(RednerinInfo, related_name='video', on_delete=models.CASCADE)
+        speacher = models.ForeignKey(Speacher, related_name='video', on_delete=models.CASCADE)
 
         def __str__(self):
             return self.caption
+
+

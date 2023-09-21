@@ -91,23 +91,33 @@ def test(request, pk, format=None):
         return Response(userFound)
 
 
-class RednerinViewSet(viewsets.ModelViewSet):
-    serializer_class = RednerinSerializer
+class SpeacherViewSet(viewsets.ModelViewSet):
+    serializer_class = SpeacherSerializer
 
     #@api_view(['GET'])
     def get_queryset(self):
-        rednerin = Rednerin.objects.all()
+        speacher = Speacher.objects.all()
 
-        return rednerin
+        return speacher
 
-class RednerinInfoViewSet(viewsets.ModelViewSet):
-    serializer_class = RednerinInfoSerializer
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+class SpeacherInfoViewSet(viewsets.ModelViewSet):
+    serializer_class = SpeacherInfoSerializer
 
     #@api_view(['GET', 'POST'])
     def get_queryset(self):
-        rednerin_info = RednerinInfo.objects.all()
+        speacherinfo = SpeacherInfo.objects.all()
 
-        return rednerin_info
+        return speacherinfo
 
 class SubjectViewSet(viewsets.ModelViewSet):
     serializer_class = SubjectSerializer
@@ -136,6 +146,15 @@ class SocialNetworkViewSet(viewsets.ModelViewSet):
 
         return social_network
 
+class PhotoViewSet(viewsets.ModelViewSet):
+    serializer_class = PhotoSerializer
+
+    #@api_view(['GET', 'POST'])
+    def get_queryset(self):
+        photo = Photo.objects.all()
+
+        return photo
+
 class VideoViewSet(viewsets.ModelViewSet):
     serializer_class = VideoSerializer
 
@@ -144,4 +163,27 @@ class VideoViewSet(viewsets.ModelViewSet):
         video = Video.objects.all()
 
         return video
+
+class ContactViewSet(viewsets.ModelViewSet):
+    serializer_class = ContactSerializer
+
+    #@api_view(['GET', 'POST'])
+    def get_queryset(self):
+        contact = Contact.objects.all()
+        #contact = Contact.objects.filter(
+        #   street__startswith=''
+        #).values('id')
+
+        return contact
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def perform_create(self, serializer):
+        serializer.save()
+
 

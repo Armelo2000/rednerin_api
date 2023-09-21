@@ -1,36 +1,28 @@
 
 from rest_framework import serializers
 
-from .models import Rednerin, RednerinInfo, SocialNetwork, Url, Subject, Video
-
+from .models import *
+#from drf_writable_nested import WritableNestedModelSerializer
 
 # This class transform a Python Object to a JSON format
-class RednerinSerializer(serializers.ModelSerializer):
+class ContactSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Rednerin
-        fields = ['id', 
-        'firstname', 
-        'lastname', 
-        'street',
-        'houseNr',
-        'zipCode',
-        'city',
-        'country',
-        'phone',
-        'phonePublish',
-        'information',
-        'option',
-        'image',
-        'policy'
-
-        ]
-
-class RednerinInfoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = RednerinInfo
+        model = Contact
         fields = [
             'id',
-            'rednerin_Id',
+            'street',
+            'houseNr',
+            'zipCode',
+            'city',
+            'country',
+            'phone',
+        ]  
+
+class SpeacherInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SpeacherInfo
+        fields = [
+            'id',
             'language',
             'profession',
             'reference',
@@ -40,12 +32,8 @@ class RednerinInfoSerializer(serializers.ModelSerializer):
             'exampleLecture',
             'shortBiography',
             'longBiography',
-            'subject',
-            'url',
-            'socialnetwork',
-            'video',
         ]
-        depth = 1
+       # depth = 1
 
 class SocialNetworkSerializer(serializers.ModelSerializer):
     class Meta:
@@ -72,6 +60,15 @@ class UrlSerializer(serializers.ModelSerializer):
             'urlLink',
         ]    
 
+class PhotoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Photo
+        fields = [
+            'id',
+            'caption',
+            'photo',
+        ]  
+
 class VideoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Video
@@ -79,7 +76,30 @@ class VideoSerializer(serializers.ModelSerializer):
             'id',
             'caption',
             'video',
-            #'rednerinInfo'
         ]  
 
+
+class SpeacherSerializer(serializers.ModelSerializer):
+    contact = ContactSerializer(required=True)
+    info = SpeacherInfoSerializer(required=True)
+
+    class Meta:
+        model = Speacher
+        fields = [
+            'id', 
+            'firstname', 
+            'lastname', 
+            'phonePublish',
+            'accountType',
+            'policy',
+            'info',
+            'contact',
+            'subject',
+            'url',
+            'socialnetwork',
+            'video',
+            'photo'
+
+        ]
+        depth=1
 
